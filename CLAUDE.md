@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use UICollectionView or UITableView for list-based interfaces depending on the UI requirements.
 - Keep UI rendering and user interaction inside UIViewController / UIView classes.
 - Business logic must not be placed directly inside UIViewController.
+- Use Google Material Design
 
 ## Project state
 
