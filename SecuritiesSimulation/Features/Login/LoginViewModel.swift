@@ -7,6 +7,11 @@ import Foundation
 import Combine
 
 /// Screen state, validation, and login orchestration for the login screen.
+///
+/// Depends only on `AuthServicing`/`SessionStoring` — never on their
+/// concrete types, `APIError`, or HTTP details. `AppCoordinator` supplies
+/// the dependencies and decides what happens after `onLoginSucceeded`.
+@MainActor
 final class LoginViewModel {
 
     @Published private(set) var isLoginEnabled: Bool = false
@@ -15,7 +20,8 @@ final class LoginViewModel {
     @Published private(set) var generalErrorMessage: String?
     @Published private(set) var isLoading: Bool = false
 
-    /// Invoked after a successful login response.
+    /// Invoked after a successful login response and once the session has
+    /// been persisted. Does not decide app navigation itself.
     var onLoginSucceeded: ((AuthenticatedUser) -> Void)?
 
     private(set) var username: String = ""
@@ -24,10 +30,7 @@ final class LoginViewModel {
     private let authService: AuthServicing
     private let sessionStore: SessionStoring
 
-    init(
-        authService: AuthServicing = AuthService(),
-        sessionStore: SessionStoring = KeychainSessionStore()
-    ) {
+    init(authService: AuthServicing, sessionStore: SessionStoring) {
         self.authService = authService
         self.sessionStore = sessionStore
     }
@@ -46,7 +49,6 @@ final class LoginViewModel {
         updateLoginEnabled()
     }
 
-    @MainActor
     func loginButtonTapped() {
         usernameErrorMessage = Self.validateUsername(username, allowEmpty: false)
         passwordErrorMessage = Self.validatePassword(password, allowEmpty: false)
@@ -55,19 +57,27 @@ final class LoginViewModel {
 
         isLoading = true
         generalErrorMessage = nil
-        let username = username
-        let password = password
 
         Task {
-            do {
-                let response = try await authService.login(mail: username, password: password)
-                sessionStore.save(accessToken: response.accessToken, refreshToken: response.refreshToken)
-                isLoading = false
-                onLoginSucceeded?(response.user)
-            } catch {
-                isLoading = false
-                generalErrorMessage = Self.message(for: error)
-            }
+            await performLogin()
+        }
+    }
+
+    private func performLogin() async {
+        do {
+            let response = try await authService.login(mail: username, password: password)
+            let session = Session(accessToken: response.accessToken, refreshToken: response.refreshToken)
+            try sessionStore.save(session)
+            isLoading = false
+            onLoginSucceeded?(response.user)
+        } catch let authError as AuthError {
+            isLoading = false
+            generalErrorMessage = Self.message(for: authError)
+        } catch {
+            // Covers SessionStoreError (save failed) and anything else
+            // unexpected — never enter the success flow without a session.
+            isLoading = false
+            generalErrorMessage = Self.genericFailureMessage
         }
     }
 
@@ -99,21 +109,16 @@ final class LoginViewModel {
         return nil
     }
 
-    private static func message(for error: Error) -> String {
+    private static let genericFailureMessage = "登入失敗，請稍後再試"
+
+    private static func message(for error: AuthError) -> String {
         switch error {
-        case APIError.httpError(let statusCode, _):
-            switch statusCode {
-            case 401, 403:
-                return "帳號或密碼錯誤"
-            default:
-                return "登入失敗（伺服器錯誤 \(statusCode)）"
-            }
-        case APIError.transportError:
-            return "無法連線到伺服器，請確認網路狀態"
-        case APIError.decodingError, APIError.invalidResponse, APIError.invalidURL, APIError.encodingError:
-            return "登入失敗，回應格式錯誤"
-        default:
-            return "登入失敗，請稍後再試"
+        case .invalidCredentials:
+            return "帳號或密碼錯誤"
+        case .serviceUnavailable:
+            return "無法連線到伺服器，請稍後再試"
+        case .unexpected:
+            return genericFailureMessage
         }
     }
 }

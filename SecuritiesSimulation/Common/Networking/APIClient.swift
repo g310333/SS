@@ -28,7 +28,7 @@ final class URLSessionAPIClient: APIClient {
     private let decoder: JSONDecoder
 
     init(
-        baseURL: URL = URLSessionAPIClient.defaultBaseURL,
+        baseURL: URL,
         session: URLSession = .shared,
         encoder: JSONEncoder = JSONEncoder(),
         decoder: JSONDecoder = JSONDecoder()
@@ -38,8 +38,6 @@ final class URLSessionAPIClient: APIClient {
         self.encoder = encoder
         self.decoder = decoder
     }
-
-    static let defaultBaseURL = URL(string: "http://127.0.0.1:8000/")!
 
     func post<Request: Encodable, Response: Decodable>(path: String, body: Request) async throws -> Response {
         guard let url = URL(string: path, relativeTo: baseURL) else {

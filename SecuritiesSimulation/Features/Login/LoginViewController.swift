@@ -251,10 +251,6 @@ final class LoginViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
-
-        viewModel.onLoginSucceeded = { [weak self] user in
-            self?.presentLoginSucceededAlert(username: user.mail)
-        }
     }
 
     private func updateLoginButtonEnabled(_ isEnabled: Bool) {
@@ -271,16 +267,6 @@ final class LoginViewController: UIViewController {
         } else {
             loginButtonSpinner.stopAnimating()
         }
-    }
-
-    private func presentLoginSucceededAlert(username: String) {
-        let alert = UIAlertController(
-            title: "登入成功",
-            message: "歡迎，\(username)",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "確定", style: .default))
-        present(alert, animated: true)
     }
 
     // MARK: - Keyboard handling

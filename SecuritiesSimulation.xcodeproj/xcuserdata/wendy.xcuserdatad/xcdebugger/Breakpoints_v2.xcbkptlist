@@ -18,64 +18,6 @@
             endingLineNumber = "63"
             landmarkName = "loginButtonTapped()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "59C8432C-208F-414A-B0E3-90A8CC2A8753 - 54962fba3381178"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for closure #1 () async -&gt; () in SecuritiesSimulation.LoginViewModel.loginButtonTapped() -&gt; ()"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Login/LoginViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "63"
-                  endingLineNumber = "63">
-               </Location>
-               <Location
-                  uuid = "59C8432C-208F-414A-B0E3-90A8CC2A8753 - 9821c3a376f7d075"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for closure #1 () async -&gt; () in SecuritiesSimulation.LoginViewModel.loginButtonTapped() -&gt; ()"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Login/LoginViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "63"
-                  endingLineNumber = "63">
-               </Location>
-               <Location
-                  uuid = "59C8432C-208F-414A-B0E3-90A8CC2A8753 - ccde774b6067bd62"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for closure #1 () async -&gt; () in SecuritiesSimulation.LoginViewModel.loginButtonTapped() -&gt; ()"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Login/LoginViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "63"
-                  endingLineNumber = "63">
-               </Location>
-               <Location
-                  uuid = "59C8432C-208F-414A-B0E3-90A8CC2A8753 - 2b2401ecc7c69369"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for closure #1 () async -&gt; () in SecuritiesSimulation.LoginViewModel.loginButtonTapped() -&gt; ()"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Login/LoginViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "63"
-                  endingLineNumber = "63">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -90,7 +32,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "68"
             endingLineNumber = "68"
-            landmarkName = "loginButtonTapped()"
+            landmarkName = "performLogin()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
