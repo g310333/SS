@@ -53,7 +53,8 @@ final class AppCoordinator {
     }
 
     private func handleAuthSuccess(user _: AuthenticatedUser) {
-        let homeViewController = HomeViewController()
+        let viewModel = HomeViewModel(stockService: container.stockService)
+        let homeViewController = HomeViewController(viewModel: viewModel)
         navigationController.setViewControllers([homeViewController], animated: true)
     }
 

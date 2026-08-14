@@ -14,11 +14,13 @@ final class AppContainer {
     let apiClient: APIClient
     let authService: AuthServicing
     let sessionStore: SessionStoring
+    let stockService: StockServicing
 
     init() {
         let apiClient = URLSessionAPIClient(baseURL: AppConfiguration.apiBaseURL)
         self.apiClient = apiClient
         self.authService = AuthService(apiClient: apiClient)
         self.sessionStore = KeychainSessionStore()
+        self.stockService = StockService(apiClient: apiClient)
     }
 }

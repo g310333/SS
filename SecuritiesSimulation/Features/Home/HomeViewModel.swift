@@ -32,6 +32,9 @@ struct HomeViewState: Equatable {
     var categories: [String]
     var selectedCategoryIndex: Int
     var isSearchActive: Bool
+    var stocks: [Stock]
+    var isLoadingStocks: Bool
+    var stocksErrorMessage: String?
 
     var selectedCategory: String? {
         categories.indices.contains(selectedCategoryIndex) ? categories[selectedCategoryIndex] : nil
@@ -51,19 +54,49 @@ final class HomeViewModel {
 
     @Published private(set) var state: HomeViewState
 
+    private let stockService: StockServicing
+
     /// Main market categories shown when browsing all stocks.
     private let marketCategories = ["熱門", "上市", "上櫃", "權值股", "電子", "金融", "傳產"]
 
     /// User-defined groups shown when browsing the watchlist.
     private let watchlistCategories = ["全部自選", "自訂群組 1", "自訂群組 2"]
 
-    init() {
+    init(stockService: StockServicing) {
+        self.stockService = stockService
         state = HomeViewState(
             segment: .market,
             categories: marketCategories,
             selectedCategoryIndex: 0,
-            isSearchActive: false
+            isSearchActive: false,
+            stocks: [],
+            isLoadingStocks: false,
+            stocksErrorMessage: nil
         )
+        loadStocks()
+    }
+
+    func loadStocks() {
+        var loadingState = state
+        loadingState.isLoadingStocks = true
+        loadingState.stocksErrorMessage = nil
+        state = loadingState
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let stocks = try await self.stockService.fetchStocks()
+                var newState = self.state
+                newState.stocks = stocks
+                newState.isLoadingStocks = false
+                self.state = newState
+            } catch {
+                var newState = self.state
+                newState.isLoadingStocks = false
+                newState.stocksErrorMessage = "無法載入股票資料，請稍後再試"
+                self.state = newState
+            }
+        }
     }
 
     func selectSegment(_ segment: StockListSegment) {

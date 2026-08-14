@@ -19,10 +19,27 @@ final class HomeViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let segmentedTabBar = SegmentedTabBar(titles: StockListSegment.allCases.map(\.title))
     private let categoryChipBar = CategoryChipBar()
+    private let contentContainerView = UIView()
     private let contentPlaceholderLabel = UILabel()
+    private let loadingIndicator = UIActivityIndicatorView(style: .medium)
+    private let stockCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 12
+        layout.minimumInteritemSpacing = 12
+        layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.register(StockCardCell.self, forCellWithReuseIdentifier: StockCardCell.reuseIdentifier)
+        return collectionView
+    }()
 
-    init(viewModel: HomeViewModel? = nil) {
-        self.viewModel = viewModel ?? HomeViewModel()
+    /// Backing store for `stockCollectionView`. Kept as a plain array rather
+    /// than reaching into `viewModel.state` from the data source methods, so
+    /// the collection view only ever reflects the last rendered snapshot.
+    private var stocks: [Stock] = []
+
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -73,6 +90,12 @@ final class HomeViewController: UIViewController {
         contentPlaceholderLabel.textColor = MaterialPalette.textSecondary
         contentPlaceholderLabel.textAlignment = .center
 
+        stockCollectionView.dataSource = self
+        stockCollectionView.delegate = self
+        stockCollectionView.isHidden = true
+
+        setUpContentContainer()
+
         let bottomBar = makeBottomBar()
 
         let rootStack = UIStackView(arrangedSubviews: [
@@ -80,7 +103,7 @@ final class HomeViewController: UIViewController {
             searchBar,
             segmentedTabBar,
             categoryChipBar,
-            contentPlaceholderLabel,
+            contentContainerView,
             bottomBar,
         ])
         rootStack.axis = .vertical
@@ -98,6 +121,23 @@ final class HomeViewController: UIViewController {
             categoryChipBar.heightAnchor.constraint(equalToConstant: 44),
             bottomBar.heightAnchor.constraint(equalToConstant: 64),
         ])
+    }
+
+    /// `contentPlaceholderLabel`, `stockCollectionView`, and `loadingIndicator`
+    /// occupy the same region and are toggled by `render(_:)` rather than
+    /// swapped in and out of the stack, so the row above and below never
+    /// reflow as the segment/loading state changes.
+    private func setUpContentContainer() {
+        for subview in [contentPlaceholderLabel, stockCollectionView, loadingIndicator] {
+            subview.translatesAutoresizingMaskIntoConstraints = false
+            contentContainerView.addSubview(subview)
+            NSLayoutConstraint.activate([
+                subview.topAnchor.constraint(equalTo: contentContainerView.topAnchor),
+                subview.leadingAnchor.constraint(equalTo: contentContainerView.leadingAnchor),
+                subview.trailingAnchor.constraint(equalTo: contentContainerView.trailingAnchor),
+                subview.bottomAnchor.constraint(equalTo: contentContainerView.bottomAnchor),
+            ])
+        }
     }
 
     private func makeBottomBar() -> UIView {
@@ -184,7 +224,7 @@ final class HomeViewController: UIViewController {
     /// previous segment's category list.
     private func render(_ state: HomeViewState) {
         categoryChipBar.configure(titles: state.categories, selectedIndex: state.selectedCategoryIndex)
-        contentPlaceholderLabel.text = "\(state.segment.title) · \(state.selectedCategory ?? "")"
+        renderContent(state)
 
         let shouldHideSearchBar = !state.isSearchActive
         guard searchBar.isHidden != shouldHideSearchBar else { return }
@@ -192,6 +232,76 @@ final class HomeViewController: UIViewController {
             self.searchBar.isHidden = shouldHideSearchBar
             self.view.layoutIfNeeded()
         }
+    }
+
+    /// Shows exactly one of the placeholder label, the stock grid, or the
+    /// loading indicator, depending on segment and load state.
+    private func renderContent(_ state: HomeViewState) {
+        guard state.segment == .market else {
+            loadingIndicator.stopAnimating()
+            stockCollectionView.isHidden = true
+            contentPlaceholderLabel.isHidden = false
+            contentPlaceholderLabel.text = "\(state.segment.title) · \(state.selectedCategory ?? "")"
+            return
+        }
+
+        if state.isLoadingStocks {
+            stockCollectionView.isHidden = true
+            contentPlaceholderLabel.isHidden = true
+            loadingIndicator.startAnimating()
+        } else if let message = state.stocksErrorMessage {
+            loadingIndicator.stopAnimating()
+            stockCollectionView.isHidden = true
+            contentPlaceholderLabel.isHidden = false
+            contentPlaceholderLabel.text = message
+        } else if state.stocks.isEmpty {
+            loadingIndicator.stopAnimating()
+            stockCollectionView.isHidden = true
+            contentPlaceholderLabel.isHidden = false
+            contentPlaceholderLabel.text = "目前沒有股票資料"
+        } else {
+            loadingIndicator.stopAnimating()
+            contentPlaceholderLabel.isHidden = true
+            stockCollectionView.isHidden = false
+            stocks = state.stocks
+            stockCollectionView.reloadData()
+        }
+    }
+}
+
+// MARK: - UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
+
+extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        stocks.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: StockCardCell.reuseIdentifier,
+            for: indexPath
+        ) as! StockCardCell
+        cell.configure(with: stocks[indexPath.item])
+        return cell
+    }
+
+    /// Two cards per row: width is half the available content width minus
+    /// the inter-item spacing and section insets.
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        guard let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout else {
+            return .zero
+        }
+        let availableWidth = collectionView.bounds.width
+            - flowLayout.sectionInset.left
+            - flowLayout.sectionInset.right
+            - flowLayout.minimumInteritemSpacing
+        let itemWidth = floor(availableWidth / 2)
+        return CGSize(width: itemWidth, height: 140)
     }
 }
 
@@ -400,5 +510,99 @@ private final class ChipButton: UIButton {
         configuration?.baseForegroundColor = selected ? MaterialPalette.onPrimary : MaterialPalette.textSecondary
         backgroundColor = selected ? MaterialPalette.primary : .clear
         layer.borderColor = (selected ? MaterialPalette.primary : MaterialPalette.divider).cgColor
+    }
+}
+
+// MARK: - StockCardCell
+
+/// A two-per-row Material card showing a stock's code, name, and its
+/// opening / high / low / closing prices for the day.
+private final class StockCardCell: UICollectionViewCell {
+
+    static let reuseIdentifier = "StockCardCell"
+
+    private let codeLabel = UILabel()
+    private let nameLabel = UILabel()
+    private let openValueLabel = UILabel()
+    private let highValueLabel = UILabel()
+    private let lowValueLabel = UILabel()
+    private let closeValueLabel = UILabel()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setUpViews()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setUpViews() {
+        contentView.backgroundColor = MaterialPalette.surface
+        contentView.layer.cornerRadius = 12
+        contentView.clipsToBounds = true
+
+        codeLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        codeLabel.textColor = MaterialPalette.textPrimary
+
+        nameLabel.font = .systemFont(ofSize: 13)
+        nameLabel.textColor = MaterialPalette.textSecondary
+        nameLabel.lineBreakMode = .byTruncatingTail
+
+        let headerStack = UIStackView(arrangedSubviews: [codeLabel, nameLabel])
+        headerStack.axis = .vertical
+        headerStack.spacing = 2
+
+        let metricsStack = UIStackView(arrangedSubviews: [
+            makeMetricRow(title: "開盤", valueLabel: openValueLabel),
+            makeMetricRow(title: "最高", valueLabel: highValueLabel),
+            makeMetricRow(title: "最低", valueLabel: lowValueLabel),
+            makeMetricRow(title: "收盤", valueLabel: closeValueLabel),
+        ])
+        metricsStack.axis = .vertical
+        metricsStack.spacing = 4
+
+        let rootStack = UIStackView(arrangedSubviews: [headerStack, metricsStack])
+        rootStack.axis = .vertical
+        rootStack.spacing = 8
+        rootStack.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(rootStack)
+
+        NSLayoutConstraint.activate([
+            rootStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            rootStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            rootStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            rootStack.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -12),
+        ])
+    }
+
+    private func makeMetricRow(title: String, valueLabel: UILabel) -> UIView {
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 12)
+        titleLabel.textColor = MaterialPalette.textSecondary
+        titleLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+        valueLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        valueLabel.textColor = MaterialPalette.textPrimary
+        valueLabel.textAlignment = .right
+
+        let row = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
+        row.axis = .horizontal
+        row.distribution = .fill
+        return row
+    }
+
+    func configure(with stock: Stock) {
+        codeLabel.text = stock.code
+        nameLabel.text = stock.name
+        openValueLabel.text = Self.formattedPrice(stock.openingPrice)
+        highValueLabel.text = Self.formattedPrice(stock.highestPrice)
+        lowValueLabel.text = Self.formattedPrice(stock.lowestPrice)
+        closeValueLabel.text = Self.formattedPrice(stock.closingPrice)
+    }
+
+    private static func formattedPrice(_ price: Double) -> String {
+        String(format: "%.2f", price)
     }
 }

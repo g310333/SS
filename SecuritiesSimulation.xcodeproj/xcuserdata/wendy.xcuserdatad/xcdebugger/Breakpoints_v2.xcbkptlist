@@ -7,33 +7,75 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "59C8432C-208F-414A-B0E3-90A8CC2A8753"
+            uuid = "8F6687BD-FCBC-4331-BD85-30989601E352"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SecuritiesSimulation/Features/Login/LoginViewModel.swift"
+            filePath = "SecuritiesSimulation/Features/Home/StockService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "63"
-            endingLineNumber = "63"
-            landmarkName = "loginButtonTapped()"
+            startingLineNumber = "22"
+            endingLineNumber = "22"
+            landmarkName = "fetchStocks()"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D148E297-DE56-48A9-B46D-EC54CAD00130"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SecuritiesSimulation/Features/Login/LoginViewModel.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
-            landmarkName = "performLogin()"
-            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - 27fadadff9d2f5d5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
+                  moduleName = "SecuritiesSimulation.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22">
+               </Location>
+               <Location
+                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - 7a4c1ec4517e6b83"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) await resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
+                  moduleName = "SecuritiesSimulation.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22">
+               </Location>
+               <Location
+                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - fc5db1e6b23ab22b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
+                  moduleName = "SecuritiesSimulation.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22">
+               </Location>
+               <Location
+                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - 2172e4810e29502a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
+                  moduleName = "SecuritiesSimulation.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

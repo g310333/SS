@@ -16,6 +16,7 @@ enum APIError: Error {
 
 protocol APIClient {
     func post<Request: Encodable, Response: Decodable>(path: String, body: Request) async throws -> Response
+    func get<Response: Decodable>(path: String) async throws -> Response
 }
 
 /// Minimal JSON-over-HTTP client. All app services should go through this
@@ -55,6 +56,22 @@ final class URLSessionAPIClient: APIClient {
             throw APIError.encodingError(error)
         }
 
+        return try await send(request)
+    }
+
+    func get<Response: Decodable>(path: String) async throws -> Response {
+        guard let url = URL(string: path, relativeTo: baseURL) else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        return try await send(request)
+    }
+
+    private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let data: Data
         let response: URLResponse
         do {
