@@ -19,6 +19,10 @@ final class StockDetailViewController: UIViewController {
     private let viewModel: StockDetailViewModel
     private let stockGroupService: StockGroupServicing
 
+    /// Invoked when the user taps "模擬下單". `AppCoordinator` decides what
+    /// happens next (pushing the order screen).
+    var onPlaceOrder: ((Stock) -> Void)?
+
     private let backButton = UIButton(type: .system)
     private let titleLabel = UILabel()
     private let industryLabel = UILabel()
@@ -32,6 +36,8 @@ final class StockDetailViewController: UIViewController {
     private let periodTitles = ["分時", "日K", "週K", "月K"]
     private var selectedPeriodIndex = 1
     private let chartPlaceholderView = UIView()
+
+    private let orderButton = UIButton(configuration: .filled())
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -299,9 +305,9 @@ final class StockDetailViewController: UIViewController {
         buyConfig.baseBackgroundColor = MaterialPalette.primary
         buyConfig.baseForegroundColor = MaterialPalette.onPrimary
         buyConfig.cornerStyle = .medium
-        let buyButton = UIButton(configuration: buyConfig)
+        orderButton.configuration = buyConfig
 
-        let buttonsRow = UIStackView(arrangedSubviews: [buyButton])
+        let buttonsRow = UIStackView(arrangedSubviews: [orderButton])
         buttonsRow.axis = .horizontal
         buttonsRow.distribution = .fillEqually
         buttonsRow.translatesAutoresizingMaskIntoConstraints = false
@@ -327,6 +333,11 @@ final class StockDetailViewController: UIViewController {
     private func setUpActions() {
         backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         favoriteButton.addTarget(self, action: #selector(favoriteButtonTapped), for: .touchUpInside)
+        orderButton.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
+    }
+
+    @objc private func orderButtonTapped() {
+        onPlaceOrder?(viewModel.stock)
     }
 
     @objc private func backButtonTapped() {

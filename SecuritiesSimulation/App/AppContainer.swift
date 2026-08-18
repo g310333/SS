@@ -16,6 +16,7 @@ final class AppContainer {
     let sessionStore: SessionStoring
     let stockService: StockServicing
     let stockGroupService: StockGroupServicing
+    let tradeService: TradeServicing
 
     init() {
         let sessionStore = KeychainSessionStore()
@@ -25,5 +26,6 @@ final class AppContainer {
         self.authService = AuthService(apiClient: apiClient)
         self.stockService = StockService(apiClient: apiClient)
         self.stockGroupService = StockGroupService(apiClient: apiClient)
+        self.tradeService = TradeService(apiClient: apiClient)
     }
 }

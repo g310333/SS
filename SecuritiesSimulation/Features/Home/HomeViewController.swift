@@ -8,7 +8,9 @@ import Combine
 
 /// Home / market overview screen: a title bar with search, a segmented
 /// switch between "全部股票" and "自選", a category bar underneath that
-/// changes per segment, a content area, and a bottom action bar.
+/// changes per segment, and a content area. This is the "股票" tab's root
+/// screen — the app-level bottom tab bar (股票／持有股票／個人) lives on the
+/// `UITabBarController` wrapping it, set up in `AppCoordinator`.
 final class HomeViewController: UIViewController {
 
     private let viewModel: HomeViewModel
@@ -100,15 +102,12 @@ final class HomeViewController: UIViewController {
 
         setUpContentContainer()
 
-        let bottomBar = makeBottomBar()
-
         let rootStack = UIStackView(arrangedSubviews: [
             headerContainer,
             searchBar,
             segmentedTabBar,
             categoryChipBar,
             contentContainerView,
-            bottomBar,
         ])
         rootStack.axis = .vertical
         rootStack.spacing = 0
@@ -123,7 +122,6 @@ final class HomeViewController: UIViewController {
 
             segmentedTabBar.heightAnchor.constraint(equalToConstant: 44),
             categoryChipBar.heightAnchor.constraint(equalToConstant: 44),
-            bottomBar.heightAnchor.constraint(equalToConstant: 64),
         ])
     }
 
@@ -142,53 +140,6 @@ final class HomeViewController: UIViewController {
                 subview.bottomAnchor.constraint(equalTo: contentContainerView.bottomAnchor),
             ])
         }
-    }
-
-    private func makeBottomBar() -> UIView {
-        let container = UIView()
-
-        let divider = UIView()
-        divider.backgroundColor = MaterialPalette.divider
-        divider.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(divider)
-
-        let buttonsRow = UIStackView(arrangedSubviews: [
-            makeBottomBarButton(title: "篩選", systemImageName: "line.3.horizontal.decrease.circle"),
-            makeBottomBarButton(title: "排序", systemImageName: "arrow.up.arrow.down"),
-        ])
-        buttonsRow.axis = .horizontal
-        buttonsRow.distribution = .fillEqually
-        buttonsRow.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(buttonsRow)
-
-        NSLayoutConstraint.activate([
-            divider.topAnchor.constraint(equalTo: container.topAnchor),
-            divider.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 1),
-
-            buttonsRow.topAnchor.constraint(equalTo: divider.bottomAnchor),
-            buttonsRow.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            buttonsRow.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            buttonsRow.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-        ])
-
-        return container
-    }
-
-    private func makeBottomBarButton(title: String, systemImageName: String) -> UIButton {
-        var config = UIButton.Configuration.plain()
-        config.title = title
-        config.image = UIImage(systemName: systemImageName)
-        config.imagePlacement = .top
-        config.imagePadding = 4
-        config.baseForegroundColor = MaterialPalette.textSecondary
-        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var outgoing = incoming
-            outgoing.font = .systemFont(ofSize: 11, weight: .medium)
-            return outgoing
-        }
-        return UIButton(configuration: config)
     }
 
     // MARK: - Actions

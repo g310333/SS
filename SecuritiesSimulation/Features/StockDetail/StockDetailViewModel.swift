@@ -42,6 +42,12 @@ final class StockDetailViewModel {
 
     let state: StockDetailViewState
 
+    /// The raw snapshot `state` was built from — kept around so the order
+    /// screen (pushed from the bottom bar's "模擬下單" button) has the
+    /// numeric fields it needs (e.g. `closingPrice`) without re-parsing the
+    /// formatted display strings.
+    let stock: Stock
+
     /// Watchlist groups the current stock already belongs to, resolved via
     /// `loadFavoriteStatus()`. The star button is filled whenever this is
     /// non-empty.
@@ -50,6 +56,7 @@ final class StockDetailViewModel {
     private let stockGroupService: StockGroupServicing
 
     init(stock: Stock, stockGroupService: StockGroupServicing) {
+        self.stock = stock
         self.stockGroupService = stockGroupService
         state = StockDetailViewState(
             code: stock.code,

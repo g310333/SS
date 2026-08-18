@@ -14,6 +14,12 @@ final class AppCoordinator {
     private let container: AppContainer
     private let navigationController: UINavigationController
 
+    /// The "股票" tab's own push stack, set up in `handleAuthSuccess`.
+    /// Stock detail / order screens push here rather than onto
+    /// `navigationController`, so they stay scoped to that tab and don't
+    /// cover the bottom tab bar.
+    private var stockNavigationController: UINavigationController?
+
     init(container: AppContainer, navigationController: UINavigationController) {
         self.container = container
         self.navigationController = navigationController
@@ -53,12 +59,36 @@ final class AppCoordinator {
     }
 
     private func handleAuthSuccess(user _: AuthenticatedUser) {
-        let viewModel = HomeViewModel(stockService: container.stockService, stockGroupService: container.stockGroupService)
-        let homeViewController = HomeViewController(viewModel: viewModel)
+        let tabBarController = makeMainTabBarController()
+        navigationController.setViewControllers([tabBarController], animated: true)
+    }
+
+    /// Builds the post-login root: a bottom tab bar with 股票／持有股票／個人.
+    /// Only the 股票 tab needs its own push stack (for stock detail and
+    /// order screens), tracked via `stockNavigationController`.
+    private func makeMainTabBarController() -> UITabBarController {
+        let homeViewModel = HomeViewModel(stockService: container.stockService, stockGroupService: container.stockGroupService)
+        let homeViewController = HomeViewController(viewModel: homeViewModel)
         homeViewController.onSelectStock = { [weak self] stock in
             self?.showStockDetail(stock: stock)
         }
-        navigationController.setViewControllers([homeViewController], animated: true)
+        let stockNav = UINavigationController(rootViewController: homeViewController)
+        stockNav.setNavigationBarHidden(true, animated: false)
+        stockNav.tabBarItem = UITabBarItem(title: "股票", image: UIImage(systemName: "chart.bar"), tag: 0)
+        stockNavigationController = stockNav
+
+        let holdingsNav = UINavigationController(rootViewController: HoldingsViewController())
+        holdingsNav.setNavigationBarHidden(true, animated: false)
+        holdingsNav.tabBarItem = UITabBarItem(title: "持有股票", image: UIImage(systemName: "briefcase"), tag: 1)
+
+        let profileNav = UINavigationController(rootViewController: ProfileViewController())
+        profileNav.setNavigationBarHidden(true, animated: false)
+        profileNav.tabBarItem = UITabBarItem(title: "個人", image: UIImage(systemName: "person.circle"), tag: 2)
+
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [stockNav, holdingsNav, profileNav]
+        tabBarController.tabBar.tintColor = MaterialPalette.primary
+        return tabBarController
     }
 
     private func showStockDetail(stock: Stock) {
@@ -67,7 +97,16 @@ final class AppCoordinator {
             viewModel: viewModel,
             stockGroupService: container.stockGroupService
         )
-        navigationController.pushViewController(detailViewController, animated: true)
+        detailViewController.onPlaceOrder = { [weak self] stock in
+            self?.showOrder(stock: stock)
+        }
+        stockNavigationController?.pushViewController(detailViewController, animated: true)
+    }
+
+    private func showOrder(stock: Stock) {
+        let viewModel = OrderViewModel(stock: stock, tradeService: container.tradeService)
+        let orderViewController = OrderViewController(viewModel: viewModel)
+        stockNavigationController?.pushViewController(orderViewController, animated: true)
     }
 
     /// Registration returns the created user but no session tokens, so the

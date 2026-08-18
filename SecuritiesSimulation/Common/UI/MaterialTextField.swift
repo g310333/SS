@@ -16,6 +16,11 @@ final class MaterialTextField: UIView {
         set { textField.text = newValue }
     }
 
+    var title: String {
+        get { titleLabel.text ?? "" }
+        set { titleLabel.text = newValue }
+    }
+
     var errorMessage: String? {
         didSet { updateErrorState() }
     }
