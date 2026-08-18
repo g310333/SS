@@ -8,6 +8,7 @@ import Foundation
 protocol StockGroupServicing {
     func fetchStockGroups() async throws -> [StockGroup]
     func createStockGroup(name: String, stockCode: String) async throws -> StockGroup
+    func addStock(stockCode: String, toGroupID groupID: Int) async throws -> StockGroup
 }
 
 final class StockGroupService: StockGroupServicing {
@@ -32,6 +33,17 @@ final class StockGroupService: StockGroupServicing {
         do {
             let request = CreateStockGroupRequest(name: name, stockCode: stockCode)
             return try await apiClient.post(path: "stock-groups", body: request)
+        } catch let error as APIError {
+            throw Self.stockGroupError(for: error)
+        } catch {
+            throw StockGroupError.unexpected
+        }
+    }
+
+    func addStock(stockCode: String, toGroupID groupID: Int) async throws -> StockGroup {
+        do {
+            let request = AddStockToGroupRequest(groupID: groupID, stockCode: stockCode)
+            return try await apiClient.post(path: "stock-groups/stocks", body: request)
         } catch let error as APIError {
             throw Self.stockGroupError(for: error)
         } catch {

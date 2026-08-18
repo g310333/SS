@@ -39,12 +39,27 @@ final class GroupSelectionViewModel {
     /// alert without disturbing the rest of the sheet's state.
     var onAddGroupFailed: (() -> Void)?
 
+    /// Invoked when `confirmSelection` fails to persist a newly checked
+    /// group, so the view can surface a transient alert without dismissing.
+    var onConfirmFailed: (() -> Void)?
+
     private let stockGroupService: StockGroupServicing
     private let stockCode: String
+
+    /// Groups the stock already belonged to when the sheet opened —
+    /// `confirmSelection` only calls `POST /stock-groups/stocks` for groups
+    /// outside this set, since these are already linked server-side.
+    private let initialSelectedGroupIDs: Set<Int>
+
+    /// Groups created (and seeded with the stock) via `addGroup` this
+    /// session — the create call already adds the stock server-side, so
+    /// `confirmSelection` must not call `addStock` for them again.
+    private var serverSeededGroupIDs: Set<Int> = []
 
     init(stockGroupService: StockGroupServicing, stockCode: String, selectedGroupIDs: Set<Int> = []) {
         self.stockGroupService = stockGroupService
         self.stockCode = stockCode
+        self.initialSelectedGroupIDs = selectedGroupIDs
         state = GroupSelectionViewState(groups: [], selectedGroupIDs: selectedGroupIDs, isLoading: true, errorMessage: nil)
         loadGroups()
     }
@@ -99,8 +114,37 @@ final class GroupSelectionViewModel {
                 newState.groups.append(group)
                 newState.selectedGroupIDs.insert(group.id)
                 self.state = newState
+                self.serverSeededGroupIDs.insert(group.id)
             } catch {
                 self.onAddGroupFailed?()
+            }
+        }
+    }
+
+    /// Persists the stock into every currently selected group that didn't
+    /// already contain it — i.e. every checked group other than the ones it
+    /// started in or was just created (and seeded) via `addGroup` — then
+    /// reports the confirmed selection back through `completion`.
+    func confirmSelection(completion: @escaping (Set<WatchlistGroup>) -> Void) {
+        let groupIDsToPersist = state.selectedGroupIDs
+            .subtracting(initialSelectedGroupIDs)
+            .subtracting(serverSeededGroupIDs)
+        let selectedGroups = Set(state.groups.filter { state.selectedGroupIDs.contains($0.id) })
+
+        guard !groupIDsToPersist.isEmpty else {
+            completion(selectedGroups)
+            return
+        }
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                for groupID in groupIDsToPersist {
+                    _ = try await self.stockGroupService.addStock(stockCode: self.stockCode, toGroupID: groupID)
+                }
+                completion(selectedGroups)
+            } catch {
+                self.onConfirmFailed?()
             }
         }
     }

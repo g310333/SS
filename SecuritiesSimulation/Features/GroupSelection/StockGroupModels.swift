@@ -34,3 +34,15 @@ struct CreateStockGroupRequest: Encodable {
         case stockCode = "stock_code"
     }
 }
+
+/// Request body for `POST /stock-groups/stocks`: adds one stock to an
+/// existing group.
+struct AddStockToGroupRequest: Encodable {
+    let groupID: Int
+    let stockCode: String
+
+    enum CodingKeys: String, CodingKey {
+        case groupID = "group_id"
+        case stockCode = "stock_code"
+    }
+}

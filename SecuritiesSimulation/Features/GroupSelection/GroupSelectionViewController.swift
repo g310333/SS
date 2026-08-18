@@ -55,6 +55,10 @@ final class GroupSelectionViewController: UIViewController {
         viewModel.onAddGroupFailed = { [weak self] in
             self?.presentAddGroupFailedAlert()
         }
+        viewModel.onConfirmFailed = { [weak self] in
+            self?.confirmButton.isEnabled = true
+            self?.presentConfirmFailedAlert()
+        }
     }
 
     // MARK: - Layout
@@ -184,10 +188,18 @@ final class GroupSelectionViewController: UIViewController {
         present(alert, animated: true)
     }
 
+    private func presentConfirmFailedAlert() {
+        let alert = UIAlertController(title: "加入群組失敗", message: "請稍後再試", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "確定", style: .default))
+        present(alert, animated: true)
+    }
+
     @objc private func confirmButtonTapped() {
-        let selectedGroups = groups.filter { selectedGroupIDs.contains($0.id) }
-        onConfirm?(Set(selectedGroups))
-        dismiss(animated: true)
+        confirmButton.isEnabled = false
+        viewModel.confirmSelection { [weak self] selectedGroups in
+            self?.onConfirm?(selectedGroups)
+            self?.dismiss(animated: true)
+        }
     }
 
     // MARK: - Binding
