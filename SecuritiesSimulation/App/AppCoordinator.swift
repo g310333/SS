@@ -53,7 +53,7 @@ final class AppCoordinator {
     }
 
     private func handleAuthSuccess(user _: AuthenticatedUser) {
-        let viewModel = HomeViewModel(stockService: container.stockService)
+        let viewModel = HomeViewModel(stockService: container.stockService, stockGroupService: container.stockGroupService)
         let homeViewController = HomeViewController(viewModel: viewModel)
         homeViewController.onSelectStock = { [weak self] stock in
             self?.showStockDetail(stock: stock)

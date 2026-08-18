@@ -239,16 +239,10 @@ final class HomeViewController: UIViewController {
     }
 
     /// Shows exactly one of the placeholder label, the stock grid, or the
-    /// loading indicator, depending on segment and load state.
+    /// loading indicator, depending on segment and load state. Both segments
+    /// render through the same two-per-row grid — `state.stocks` is already
+    /// filtered to the active segment/category by the view model.
     private func renderContent(_ state: HomeViewState) {
-        guard state.segment == .market else {
-            loadingIndicator.stopAnimating()
-            stockCollectionView.isHidden = true
-            contentPlaceholderLabel.isHidden = false
-            contentPlaceholderLabel.text = "\(state.segment.title) · \(state.selectedCategory ?? "")"
-            return
-        }
-
         if state.isLoadingStocks {
             stockCollectionView.isHidden = true
             contentPlaceholderLabel.isHidden = true
@@ -262,7 +256,7 @@ final class HomeViewController: UIViewController {
             loadingIndicator.stopAnimating()
             stockCollectionView.isHidden = true
             contentPlaceholderLabel.isHidden = false
-            contentPlaceholderLabel.text = "目前沒有股票資料"
+            contentPlaceholderLabel.text = state.segment == .market ? "目前沒有股票資料" : "目前沒有自選股票"
         } else {
             loadingIndicator.stopAnimating()
             contentPlaceholderLabel.isHidden = true
