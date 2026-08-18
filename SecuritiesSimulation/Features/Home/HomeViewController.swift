@@ -14,6 +14,10 @@ final class HomeViewController: UIViewController {
     private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
 
+    /// Invoked when the user taps a stock card. `AppCoordinator` decides
+    /// what happens next (pushing the detail screen).
+    var onSelectStock: ((Stock) -> Void)?
+
     private let titleLabel = UILabel()
     private let searchButton = UIButton(type: .system)
     private let searchBar = UISearchBar()
@@ -284,6 +288,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
         ) as! StockCardCell
         cell.configure(with: stocks[indexPath.item])
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        onSelectStock?(stocks[indexPath.item])
     }
 
     /// Two cards per row: width is half the available content width minus
@@ -594,8 +603,8 @@ private final class StockCardCell: UICollectionViewCell {
     }
 
     func configure(with stock: Stock) {
-        codeLabel.text = stock.code
-        nameLabel.text = stock.name
+        codeLabel.text = stock.name
+        nameLabel.text = stock.code
         openValueLabel.text = Self.formattedPrice(stock.openingPrice)
         highValueLabel.text = Self.formattedPrice(stock.highestPrice)
         lowValueLabel.text = Self.formattedPrice(stock.lowestPrice)

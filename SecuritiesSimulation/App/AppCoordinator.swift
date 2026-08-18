@@ -55,7 +55,19 @@ final class AppCoordinator {
     private func handleAuthSuccess(user _: AuthenticatedUser) {
         let viewModel = HomeViewModel(stockService: container.stockService)
         let homeViewController = HomeViewController(viewModel: viewModel)
+        homeViewController.onSelectStock = { [weak self] stock in
+            self?.showStockDetail(stock: stock)
+        }
         navigationController.setViewControllers([homeViewController], animated: true)
+    }
+
+    private func showStockDetail(stock: Stock) {
+        let viewModel = StockDetailViewModel(stock: stock, stockGroupService: container.stockGroupService)
+        let detailViewController = StockDetailViewController(
+            viewModel: viewModel,
+            stockGroupService: container.stockGroupService
+        )
+        navigationController.pushViewController(detailViewController, animated: true)
     }
 
     /// Registration returns the created user but no session tokens, so the

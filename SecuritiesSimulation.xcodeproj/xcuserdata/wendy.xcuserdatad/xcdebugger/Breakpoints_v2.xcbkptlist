@@ -7,75 +7,65 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8F6687BD-FCBC-4331-BD85-30989601E352"
+            uuid = "C58ECDD7-DAA6-4E28-8A13-F80DE5534735"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SecuritiesSimulation/Features/Home/StockService.swift"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "22"
-            endingLineNumber = "22"
-            landmarkName = "fetchStocks()"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
+            landmarkName = "loadGroups()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - 27fadadff9d2f5d5"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "22"
-                  endingLineNumber = "22">
-               </Location>
-               <Location
-                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - 7a4c1ec4517e6b83"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "22"
-                  endingLineNumber = "22">
-               </Location>
-               <Location
-                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - fc5db1e6b23ab22b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "22"
-                  endingLineNumber = "22">
-               </Location>
-               <Location
-                  uuid = "8F6687BD-FCBC-4331-BD85-30989601E352 - 2172e4810e29502a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for SecuritiesSimulation.StockService.fetchStocks() async throws -&gt; Swift.Array&lt;SecuritiesSimulation.Stock&gt;"
-                  moduleName = "SecuritiesSimulation.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/wendy/Alex/project/SecuritiesSimulation/SecuritiesSimulation/Features/Home/StockService.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "22"
-                  endingLineNumber = "22">
-               </Location>
-            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DE22AD60-F4F3-4DFC-8051-7D89E4B85FD3"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
+            landmarkName = "addGroupButtonTapped()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3606DC1B-1E4F-4D88-BF6F-8E42BAD23666"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "213"
+            endingLineNumber = "213"
+            landmarkName = "render(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4D82117B-737D-4B17-8AD7-8F9F154DFD94"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "219"
+            endingLineNumber = "219"
+            landmarkName = "render(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

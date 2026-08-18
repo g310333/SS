@@ -39,3 +39,14 @@ struct Stock: Decodable, Equatable {
         case industryName = "industry_name"
     }
 }
+
+/// A stock industry category, as returned by `GET /industries`.
+struct Industry: Decodable, Equatable {
+    let industry: String
+    let industryName: String
+
+    enum CodingKeys: String, CodingKey {
+        case industry
+        case industryName = "industry_name"
+    }
+}

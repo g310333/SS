@@ -7,6 +7,7 @@ import Foundation
 
 protocol StockServicing {
     func fetchStocks() async throws -> [Stock]
+    func fetchIndustries() async throws -> [Industry]
 }
 
 final class StockService: StockServicing {
@@ -20,6 +21,16 @@ final class StockService: StockServicing {
     func fetchStocks() async throws -> [Stock] {
         do {
             return try await apiClient.get(path: "stocks")
+        } catch let error as APIError {
+            throw Self.stockError(for: error)
+        } catch {
+            throw StockError.unexpected
+        }
+    }
+
+    func fetchIndustries() async throws -> [Industry] {
+        do {
+            return try await apiClient.get(path: "industries")
         } catch let error as APIError {
             throw Self.stockError(for: error)
         } catch {

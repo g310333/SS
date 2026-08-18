@@ -56,11 +56,20 @@ final class HomeViewModel {
 
     private let stockService: StockServicing
 
-    /// Main market categories shown when browsing all stocks.
-    private let marketCategories = ["熱門", "上市", "上櫃", "權值股", "電子", "金融", "傳產"]
+    private static let hotCategoryTitle = "全部"
+
+    /// Market categories shown when browsing all stocks: a static "熱門"
+    /// chip followed by whatever `fetchIndustries()` resolves to.
+    private var marketCategories = [hotCategoryTitle]
 
     /// User-defined groups shown when browsing the watchlist.
-    private let watchlistCategories = ["全部自選", "自訂群組 1", "自訂群組 2"]
+    private let watchlistCategories = ["自訂群組 1", "自訂群組 2"]
+
+    /// The unfiltered market list from the last successful `fetchStocks()`.
+    /// `state.stocks` is always a filtered view over this, keyed by the
+    /// selected category chip — kept separate so switching categories
+    /// doesn't require a re-fetch.
+    private var allStocks: [Stock] = []
 
     init(stockService: StockServicing) {
         self.stockService = stockService
@@ -74,6 +83,24 @@ final class HomeViewModel {
             stocksErrorMessage: nil
         )
         loadStocks()
+        loadIndustries()
+    }
+
+    /// Fetches the industry list and, once resolved, extends
+    /// `marketCategories` with each industry's name after the static "熱門"
+    /// chip. Left silent on failure — the chip bar simply falls back to
+    /// showing only "熱門" — since a category-list error isn't worth
+    /// surfacing the same way a failed stock list is.
+    private func loadIndustries() {
+        Task { [weak self] in
+            guard let self else { return }
+            guard let industries = try? await self.stockService.fetchIndustries() else { return }
+            self.marketCategories = [Self.hotCategoryTitle] + industries.map(\.industryName)
+            guard self.state.segment == .market else { return }
+            var newState = self.state
+            newState.categories = self.marketCategories
+            self.state = newState
+        }
     }
 
     func loadStocks() {
@@ -86,8 +113,9 @@ final class HomeViewModel {
             guard let self else { return }
             do {
                 let stocks = try await self.stockService.fetchStocks()
+                self.allStocks = stocks
                 var newState = self.state
-                newState.stocks = stocks
+                newState.stocks = self.filteredStocks(for: newState.selectedCategory)
                 newState.isLoadingStocks = false
                 self.state = newState
             } catch {
@@ -105,6 +133,9 @@ final class HomeViewModel {
         newState.segment = segment
         newState.categories = segment == .market ? marketCategories : watchlistCategories
         newState.selectedCategoryIndex = 0
+        if segment == .market {
+            newState.stocks = filteredStocks(for: newState.categories.first)
+        }
         state = newState
     }
 
@@ -112,7 +143,18 @@ final class HomeViewModel {
         guard state.categories.indices.contains(index) else { return }
         var newState = state
         newState.selectedCategoryIndex = index
+        if newState.segment == .market {
+            newState.stocks = filteredStocks(for: newState.categories[index])
+        }
         state = newState
+    }
+
+    /// `nil` or the "熱門" chip mean no filter — every fetched stock is
+    /// shown. Any other category filters `allStocks` down to the stocks
+    /// whose `industryName` matches the chip's title.
+    private func filteredStocks(for category: String?) -> [Stock] {
+        guard let category, category != Self.hotCategoryTitle else { return allStocks }
+        return allStocks.filter { $0.industryName == category }
     }
 
     func toggleSearch() {
