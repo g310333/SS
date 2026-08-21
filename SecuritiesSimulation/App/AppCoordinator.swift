@@ -29,19 +29,48 @@ final class AppCoordinator {
             sessionStore: container.sessionStore
         )
         viewModel.onLoginSucceeded = { [weak self] user in
-            self?.handleLoginSuccess(user: user)
+            self?.handleAuthSuccess(user: user)
         }
 
         let loginViewController = LoginViewController(viewModel: viewModel)
+        loginViewController.onSignUpTapped = { [weak self] in
+            self?.showRegister()
+        }
         navigationController.setViewControllers([loginViewController], animated: false)
+    }
+
+    private func showRegister() {
+        let viewModel = RegisterViewModel(authService: container.authService)
+        viewModel.onRegisterSucceeded = { [weak self] user in
+            self?.handleRegisterSuccess(user: user)
+        }
+
+        let registerViewController = RegisterViewController(viewModel: viewModel)
+        registerViewController.onLoginTapped = { [weak self] in
+            self?.navigationController.popViewController(animated: true)
+        }
+        navigationController.pushViewController(registerViewController, animated: true)
     }
 
     /// No home screen exists yet, so a placeholder acknowledgement stands
     /// in for "navigate to the post-login flow".
-    private func handleLoginSuccess(user: AuthenticatedUser) {
+    private func handleAuthSuccess(user: AuthenticatedUser) {
         let alert = UIAlertController(
             title: "登入成功",
             message: "歡迎，\(user.mail)",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "確定", style: .default))
+        navigationController.present(alert, animated: true)
+    }
+
+    /// Registration returns the created user but no session tokens, so the
+    /// user is sent back to log in rather than being signed in automatically.
+    private func handleRegisterSuccess(user: RegisterResponse) {
+        navigationController.popToRootViewController(animated: false)
+        let alert = UIAlertController(
+            title: "註冊成功",
+            message: "歡迎，\(user.nickname)，請使用新帳號登入",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "確定", style: .default))

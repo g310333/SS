@@ -117,7 +117,7 @@ final class LoginViewModel {
             return "帳號或密碼錯誤"
         case .serviceUnavailable:
             return "無法連線到伺服器，請稍後再試"
-        case .unexpected:
+        case .mailAlreadyExists, .unexpected:
             return genericFailureMessage
         }
     }

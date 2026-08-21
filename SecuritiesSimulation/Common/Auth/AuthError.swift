@@ -10,6 +10,7 @@ import Foundation
 /// these cases by `AuthService` and must not leak any further up.
 enum AuthError: Error {
     case invalidCredentials
+    case mailAlreadyExists
     case serviceUnavailable
     case unexpected
 }
