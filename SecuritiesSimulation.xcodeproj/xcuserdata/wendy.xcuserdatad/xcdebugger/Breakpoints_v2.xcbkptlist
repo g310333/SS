@@ -7,32 +7,64 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "59C8432C-208F-414A-B0E3-90A8CC2A8753"
+            uuid = "C58ECDD7-DAA6-4E28-8A13-F80DE5534735"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SecuritiesSimulation/Features/Login/LoginViewModel.swift"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "63"
-            endingLineNumber = "63"
-            landmarkName = "loginButtonTapped()"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
+            landmarkName = "loadGroups()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D148E297-DE56-48A9-B46D-EC54CAD00130"
+            uuid = "DE22AD60-F4F3-4DFC-8051-7D89E4B85FD3"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SecuritiesSimulation/Features/Login/LoginViewModel.swift"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
-            landmarkName = "performLogin()"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
+            landmarkName = "addGroupButtonTapped()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3606DC1B-1E4F-4D88-BF6F-8E42BAD23666"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "213"
+            endingLineNumber = "213"
+            landmarkName = "render(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4D82117B-737D-4B17-8AD7-8F9F154DFD94"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SecuritiesSimulation/Features/GroupSelection/GroupSelectionViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "219"
+            endingLineNumber = "219"
+            landmarkName = "render(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

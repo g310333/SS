@@ -14,11 +14,18 @@ final class AppContainer {
     let apiClient: APIClient
     let authService: AuthServicing
     let sessionStore: SessionStoring
+    let stockService: StockServicing
+    let stockGroupService: StockGroupServicing
+    let tradeService: TradeServicing
 
     init() {
-        let apiClient = URLSessionAPIClient(baseURL: AppConfiguration.apiBaseURL)
+        let sessionStore = KeychainSessionStore()
+        self.sessionStore = sessionStore
+        let apiClient = URLSessionAPIClient(baseURL: AppConfiguration.apiBaseURL, sessionStore: sessionStore)
         self.apiClient = apiClient
         self.authService = AuthService(apiClient: apiClient)
-        self.sessionStore = KeychainSessionStore()
+        self.stockService = StockService(apiClient: apiClient)
+        self.stockGroupService = StockGroupService(apiClient: apiClient)
+        self.tradeService = TradeService(apiClient: apiClient)
     }
 }

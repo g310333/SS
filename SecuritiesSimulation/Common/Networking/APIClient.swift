@@ -16,6 +16,7 @@ enum APIError: Error {
 
 protocol APIClient {
     func post<Request: Encodable, Response: Decodable>(path: String, body: Request) async throws -> Response
+    func get<Response: Decodable>(path: String) async throws -> Response
 }
 
 /// Minimal JSON-over-HTTP client. All app services should go through this
@@ -23,17 +24,20 @@ protocol APIClient {
 final class URLSessionAPIClient: APIClient {
 
     private let baseURL: URL
+    private let sessionStore: SessionStoring
     private let session: URLSession
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 
     init(
         baseURL: URL,
+        sessionStore: SessionStoring,
         session: URLSession = .shared,
         encoder: JSONEncoder = JSONEncoder(),
         decoder: JSONDecoder = JSONDecoder()
     ) {
         self.baseURL = baseURL
+        self.sessionStore = sessionStore
         self.session = session
         self.encoder = encoder
         self.decoder = decoder
@@ -48,6 +52,7 @@ final class URLSessionAPIClient: APIClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        attachAuthorization(to: &request)
 
         do {
             request.httpBody = try encoder.encode(body)
@@ -55,6 +60,32 @@ final class URLSessionAPIClient: APIClient {
             throw APIError.encodingError(error)
         }
 
+        return try await send(request)
+    }
+
+    func get<Response: Decodable>(path: String) async throws -> Response {
+        guard let url = URL(string: path, relativeTo: baseURL) else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        attachAuthorization(to: &request)
+
+        return try await send(request)
+    }
+
+    /// Attaches the signed-in user's access token as a Bearer token, if a
+    /// session exists. Endpoints called before login (e.g. login/register)
+    /// simply have no session yet, so the header is left off rather than
+    /// failing the call.
+    private func attachAuthorization(to request: inout URLRequest) {
+        guard let accessToken = try? sessionStore.load()?.accessToken else { return }
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+    }
+
+    private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let data: Data
         let response: URLResponse
         do {
